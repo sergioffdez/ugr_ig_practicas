@@ -1,6 +1,13 @@
 # Prerequisites
 *.d
 
+# Passwords
+passwd 
+.passwd
+
+#Backups 
+.back 
+
 # Compiled Object files
 *.slo
 *.lo
