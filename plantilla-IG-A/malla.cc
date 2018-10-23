@@ -135,14 +135,13 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
                                   const std::vector<Tupla3i> &triangulos)
 {
   //Declaramos el numero de vertices total y el numero de vertices del perfil
-  int aux, n_vertices, n_vertices_perfil = perfil.size();
+  int aux;
 
   this->vertices.clear();
   this->triangulos.clear();
 
   //Calculamos la tabla de vertices.
   calcular_normales(perfil, rotaciones, vertices);
-  n_vertices = vertices.size();
 
   //Calculamos la tabla de triangulos
   TablaTriangulos(perfil, rotaciones, triangulos);
@@ -152,26 +151,24 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
   if (ver1[0] != 0)
   {
     this->vertices.push_back({0.0, ver1[1], 0.0});
-    n_vertices++;
 
-    for (int i = 0; i + n_vertices_perfil < n_vertices; i += n_vertices_perfil)
-      this->triangulos.push_back({i,n_vertices - 1, (i + n_vertices_perfil) % (n_vertices - 1)});
+    for (int i = 0; i + perfil.size() < vertices.size(); i += perfil.size())
+      this->triangulos.push_back({i,vertices.size() - 1, (i + perfil.size()) % (vertices.size() - 1)});
   }
 
   //Tapa superior
-  Tupla3f ver2 = vertices[n_vertices - 2];
+  Tupla3f ver2 = vertices[vertices.size() - 2];
   if (ver2[0] != 0)
   {
     this->vertices.push_back({0.0, ver2[1], 0.0});
-    n_vertices++;
 
-    for (int i = n_vertices_perfil - 1; i + n_vertices_perfil < n_vertices; i += n_vertices_perfil)
+    for (int i = perfil.size() - 1; i < vertices.size()-1; i += perfil.size())
     {
-      this->triangulos.push_back({i, i + n_vertices_perfil, n_vertices - 1});
+      this->triangulos.push_back({vertices.size() - 1, i, (i + perfil.size()) % (vertices.size()-2)});
       aux = i;
     }
     
-    this->triangulos.push_back({aux, n_vertices_perfil - 1, n_vertices - 1});
+    //this->triangulos.push_back({aux, perfil.size() - 1, vertices.size() - 1});
   }
 }
 
@@ -197,9 +194,9 @@ std::vector<Tupla3f> ObjMallaIndexada::getColores()
 void ObjMallaIndexada::calcular_normales(const std::vector<Tupla3f> perfil, int rotaciones,
                                          const std::vector<Tupla3f> &vertices)
 {
-  this->vertices.clear();
+  //this->vertices.clear();
 
-  for (int i = 0; i < rotaciones+1; i++)
+  for (int i = 0; i < rotaciones; i++)
   {
     for (int j = 0; j < perfil.size(); j++)
     {
@@ -215,20 +212,20 @@ void ObjMallaIndexada::TablaTriangulos(const std::vector<Tupla3f> perfil, int ro
 {
   int v1, v2, v3, v4;
 
-  this->triangulos.clear();
+  //this->triangulos.clear();
 
   for(int i=0; i<rotaciones; i++)
   {
-    for(int j=0; j<perfil.size(); j++)
+    for(int j=0; j<perfil.size()-1; j++)
     {
       v1 = perfil.size() * i + j;
       v2 = perfil.size() * ((i + 1) % rotaciones) + j;
       v3 = perfil.size() * i + (j + 1);
       v4 = perfil.size() * ((i + 1) % rotaciones) + (j + 1);
+      this->triangulos.push_back({v1, v2, v4});
+      this->triangulos.push_back({v1, v4, v3});
     }
 
-    this->triangulos.push_back({v2, v3, v4});
-    this->triangulos.push_back({v2, v1, v3});
   }
 }
 
@@ -327,3 +324,15 @@ Cilindro::Cilindro(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_
 Cono::Cono(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil){}
 
 Esfera::Esfera(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil){}
+
+/*CilindroPrueba::CilindroPrueba()
+{
+  std::vector<Tupla3f> perfiles;
+  perfiles.push_back({5.0, 0.0, 0.0});
+  perfiles.push_back({5.0, 0.0, 0.0});
+  perfiles.push_back({5.0, 2.0, 0.0});
+
+  CrearMalla(perfiles, 50, vertices, triangulos);
+  ColorearObjeto();
+
+}*/

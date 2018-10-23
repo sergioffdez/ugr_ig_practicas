@@ -27,6 +27,7 @@ Escena::Escena()
     ply = new ObjPLY("plys/big_dodge.ply");
 
     cilindro = new Cilindro("plys/cilindro.ply");
+    //cilindro = new CilindroPrueba();
 
     esfera = new Esfera("plys/esfera.ply");
 
