@@ -41,6 +41,7 @@ class Escena
    Tetraedro * tetraedro = nullptr;
    ObjPLY * ply = nullptr;
    Cilindro * cilindro = nullptr;
+   //CilindroPrueba * cilindro = nullptr;
    Cono * cono = nullptr;
    Esfera * esfera = nullptr;
 
