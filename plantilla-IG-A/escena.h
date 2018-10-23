@@ -41,9 +41,9 @@ class Escena
    Tetraedro * tetraedro = nullptr;
    ObjPLY * ply = nullptr;
    Cilindro * cilindro = nullptr;
-   //CilindroPrueba * cilindro = nullptr;
    Cono * cono = nullptr;
    Esfera * esfera = nullptr;
+   ObjRevolucion * peon = nullptr;
 
    // completar: añadir punteros a tetraedro u otros (práctica 1),
    //            y a un objeto PLY y de revolución (práctica 2),

@@ -324,15 +324,3 @@ Cilindro::Cilindro(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_
 Cono::Cono(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil){}
 
 Esfera::Esfera(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil){}
-
-/*CilindroPrueba::CilindroPrueba()
-{
-  std::vector<Tupla3f> perfiles;
-  perfiles.push_back({5.0, 0.0, 0.0});
-  perfiles.push_back({5.0, 0.0, 0.0});
-  perfiles.push_back({5.0, 2.0, 0.0});
-
-  CrearMalla(perfiles, 50, vertices, triangulos);
-  ColorearObjeto();
-
-}*/

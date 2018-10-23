@@ -27,16 +27,17 @@ Escena::Escena()
     ply = new ObjPLY("plys/big_dodge.ply");
 
     cilindro = new Cilindro("plys/cilindro.ply");
-    //cilindro = new CilindroPrueba();
 
     esfera = new Esfera("plys/esfera.ply");
 
     cono = new Cono("plys/cono.ply");
 
+    peon = new ObjRevolucion("plys/peon.ply");
+
     // .......completar: ...
     // .....
 
-    num_objetos = 6; // se usa al pulsar la tecla 'O' (rotar objeto actual)
+    num_objetos = 7; // se usa al pulsar la tecla 'O' (rotar objeto actual)
 }
 
 //**************************************************************************
@@ -62,18 +63,6 @@ void Escena::inicializar(int UI_window_width, int UI_window_height)
 void Escena::dibujar_objeto_actual()
 {
     using namespace std;
-
-    //Vector de colores para dibujar el cubo y el tetraedro
-    /*float gl_color[] =
-        {
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            1.0, 1.0, 0.0,
-            1.0, 0.0, 1.0,
-            0.0, 1.0, 1.0,
-            1.0, 0.5, 0.0,
-            0.3, 0.8, 0.6};*/
 
     switch (modo_dibujo)
     {
@@ -104,6 +93,9 @@ void Escena::dibujar_objeto_actual()
         case 5:
             glColorPointer(3, GL_FLOAT, 0, cono->getColores().data());
             break; 
+        case 6:
+            glColorPointer(3, GL_FLOAT, 0, peon->getColores().data());
+            break; 
         }
         break;
     case 2:
@@ -132,6 +124,9 @@ void Escena::dibujar_objeto_actual()
             break;
          case 5:
             cono->ModoAjedrez();
+            break;
+         case 6:
+            peon->ModoAjedrez();
             break;
         }
     }
@@ -164,6 +159,10 @@ void Escena::dibujar_objeto_actual()
     case 5:
         if (cono != nullptr)
             cono->draw(modo_draw);
+        break;
+    case 6:
+        if (peon != nullptr)
+            peon->draw(modo_draw);
         break;
     default:
         cout << "draw_object: el número de objeto actual (" << objeto_actual << ") es incorrecto." << endl;
@@ -226,6 +225,8 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
             ply->draw(modo_draw);
             cilindro->draw(modo_draw);
             esfera->draw(modo_draw);
+            peon->draw(modo_draw);
+
         }
         else
         {
@@ -237,6 +238,7 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
             cilindro->draw(modo_draw);
             esfera->draw(modo_draw);
             cono->draw(modo_draw);
+            peon->draw(modo_draw);
         }
         break;
     }

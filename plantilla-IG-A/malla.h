@@ -129,10 +129,4 @@ class Esfera : public ObjRevolucion
     Esfera(const std::string &nombre_ply_perfil);
 };
 
-class CilindroPrueba : public ObjMallaIndexada
-{
-  public: 
-    CilindroPrueba();
-};
-
 #endif
