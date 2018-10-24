@@ -14,6 +14,7 @@ class Escena
    private:
 
    Ejes ejes;
+   bool animacion = false;
 
    // variables que definen la posicion de la camara en coordenadas polares
    GLfloat Observer_distance;
@@ -24,11 +25,13 @@ class Escena
    GLfloat Width, Height, Front_plane, Back_plane;
 
    void clear_window();
-	void dibujar_objeto_actual();
+   void dibujar_objeto_actual();
 
    // Transformación de cámara
 	void change_projection( const float ratio_xy );
 	void change_observer();
+
+    void conmutarAnimaciones();
 
    int objeto_actual = 0 , // objeto actual (el que se visualiza)
        num_objetos   = 0 , // número de objetos (actualizado al crear los objetos en el constructor)
@@ -44,11 +47,7 @@ class Escena
    Cono * cono = nullptr;
    Esfera * esfera = nullptr;
    ObjRevolucion * peon = nullptr;
-
-   // completar: añadir punteros a tetraedro u otros (práctica 1),
-   //            y a un objeto PLY y de revolución (práctica 2),
-   //           y a un objeto jerarquico (práctica 3).
-   // ......
+   ObjJerarquico * obj = nullptr;
 
    public:
 
@@ -62,6 +61,8 @@ class Escena
 	// Interacción con la escena
 	bool teclaPulsada( unsigned char Tecla1, int x, int y ) ;
 	void teclaEspecial( int Tecla1, int x, int y );
+
+    void mgeDesocupado();
 
 };
 #endif
