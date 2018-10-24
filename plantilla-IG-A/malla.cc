@@ -73,9 +73,11 @@ GLuint ObjMallaIndexada::CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid 
 // Función de visualización de la malla,
 // puede llamar a  draw_ModoInmediato o bien a draw_ModoDiferido
 
-void ObjMallaIndexada::draw(bool selecciona)
+void ObjMallaIndexada::draw(int modo_vis, bool selecciona)
 {
-  if (selecciona)
+ glColorPointer(3, GL_FLOAT, 0, colores.data());
+  
+  if (!selecciona)
     draw_ModoInmediato();
   else
     draw_ModoDiferido();
@@ -96,7 +98,7 @@ void ObjMallaIndexada::ModoAjedrez()
 
   for (int i = 0; i < vertices.size(); i++)
   {
-    color_impar.push_back({1.0, 0.0, 0.0});
+    color_impar.push_back({0.0, 1.0, 0.0});
     color_par.push_back({0.0, 0.0, 1.0});
   }
 
@@ -167,8 +169,6 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
       this->triangulos.push_back({vertices.size() - 1, i, (i + perfil.size()) % (vertices.size()-2)});
       aux = i;
     }
-    
-    //this->triangulos.push_back({aux, perfil.size() - 1, vertices.size() - 1});
   }
 }
 

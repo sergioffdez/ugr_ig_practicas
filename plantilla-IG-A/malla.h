@@ -25,6 +25,8 @@
 class ObjMallaIndexada
 {
 public:
+
+  std::vector<Tupla3f> colores;    // una terna de 3 floats para cada color RGB
   // dibuja el objeto en modo inmediato
   void draw_ModoInmediato();
 
@@ -36,7 +38,7 @@ public:
   // función que redibuja el objeto
   // está función llama a 'draw_MI' (modo inmediato)
   // o bien a 'draw_MD' (modo diferido, VBOs)
-  void draw(bool selecciona);
+  void draw(int modo_vis, bool selecciona);
 
   //Dibuja el modo ajedrez
   void ModoAjedrez();
@@ -65,7 +67,6 @@ protected:
 
   std::vector<Tupla3f> vertices;   // tabla de coordenadas de vértices (una tupla por vértice, con tres floats)
   std::vector<Tupla3i> triangulos; // una terna de 3 enteros por cada cara o triángulo
-  std::vector<Tupla3f> colores;    // una terna de 3 floats para cada color RGB
 
   // completar: tabla de colores, tabla de normales de vértices
 };

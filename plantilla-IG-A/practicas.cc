@@ -88,6 +88,13 @@ void special_keys( int tecla, int x, int y )
 	glutPostRedisplay();
 }
 
+//Este función será la función gestora del evento desocupado (idle event), 
+//es decir, es la función que se llamará periódicamente con las animaciones activadas.
+void funcion_desocupado()
+{
+      escena->mgeDesocupado();
+}
+
 //***************************************************************************
 // Programa principal
 //

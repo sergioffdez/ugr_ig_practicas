@@ -34,10 +34,12 @@ Escena::Escena()
 
     peon = new ObjRevolucion("plys/peon.ply");
 
+    obj = new ObjJerarquico();
+
     // .......completar: ...
     // .....
 
-    num_objetos = 7; // se usa al pulsar la tecla 'O' (rotar objeto actual)
+    num_objetos = 8; // se usa al pulsar la tecla 'O' (rotar objeto actual)
 }
 
 //**************************************************************************
@@ -72,31 +74,6 @@ void Escena::dibujar_objeto_actual()
     case 1:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Pinta en modo relleno
         glEnableClientState(GL_COLOR_ARRAY);
-
-        switch (objeto_actual)
-        {
-        case 0:
-            glColorPointer(3, GL_FLOAT, 0, cubo->getColores().data());
-            break;
-        case 1:
-            glColorPointer(3, GL_FLOAT, 0, tetraedro->getColores().data());
-            break;
-        case 2:
-            glColorPointer(3, GL_FLOAT, 0, ply->getColores().data());
-            break;
-        case 3:
-            glColorPointer(3, GL_FLOAT, 0, cilindro->getColores().data());
-            break;   
-        case 4:
-            glColorPointer(3, GL_FLOAT, 0, esfera->getColores().data());
-            break; 
-        case 5:
-            glColorPointer(3, GL_FLOAT, 0, cono->getColores().data());
-            break; 
-        case 6:
-            glColorPointer(3, GL_FLOAT, 0, peon->getColores().data());
-            break; 
-        }
         break;
     case 2:
         glDisableClientState(GL_COLOR_ARRAY);
@@ -122,10 +99,10 @@ void Escena::dibujar_objeto_actual()
         case 4:
             esfera->ModoAjedrez();
             break;
-         case 5:
+        case 5:
             cono->ModoAjedrez();
             break;
-         case 6:
+        case 6:
             peon->ModoAjedrez();
             break;
         }
@@ -138,31 +115,35 @@ void Escena::dibujar_objeto_actual()
     {
     case 0:
         if (cubo != nullptr)
-            cubo->draw(modo_draw);
+            cubo->draw(modo_dibujo, modo_draw);
         break;
     case 1:
         if (tetraedro != nullptr)
-            tetraedro->draw(modo_draw); //Se dibuja el tetraedro
+            tetraedro->draw(modo_dibujo, modo_draw); //Se dibuja el tetraedro
         break;
     case 2:
         if (ply != nullptr)
-            ply->draw(modo_draw);
+            ply->draw(modo_dibujo, modo_draw);
         break;
     case 3:
         if (cilindro != nullptr)
-            cilindro->draw(modo_draw);
+            cilindro->draw(modo_dibujo, modo_draw);
         break;
     case 4:
         if (esfera != nullptr)
-            esfera->draw(modo_draw);
+            esfera->draw(modo_dibujo, modo_draw);
         break;
     case 5:
         if (cono != nullptr)
-            cono->draw(modo_draw);
+            cono->draw(modo_dibujo, modo_draw);
         break;
     case 6:
         if (peon != nullptr)
-            peon->draw(modo_draw);
+            peon->draw(modo_dibujo, modo_draw);
+        break;
+    case 7:
+        if (obj != nullptr)
+            obj->draw(modo_dibujo, modo_draw);
         break;
     default:
         cout << "draw_object: el número de objeto actual (" << objeto_actual << ") es incorrecto." << endl;
@@ -199,46 +180,86 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
     using namespace std;
     cout << "Tecla pulsada: '" << tecla << "'" << endl;
 
-    switch (toupper(tecla))
+    switch (tecla)
     {
+    case 'q':
     case 'Q':
         // salir
         return true;
         break;
+
+    case 'o':
     case 'O':
         // activar siguiente objeto
         objeto_actual = (objeto_actual + 1) % num_objetos;
         cout << "objeto actual == " << objeto_actual << endl;
         break;
+
+    case 'm':
     case 'M':
         //Se cambia el modo de dibujo de lineas a puntos a relleno, o ajedrez
         modo_dibujo = (modo_dibujo + 1) % 4;
         break;
+
+    case 'p':
+    case 'P':
+        //Se activa el parametro siguiente al actual
+        obj->siguienteParametro();
+        break;
+
+    case 'a':
+    case 'A':
+        //Activa o desactiva las animaciones
+        conmutarAnimaciones();
+        break;
+
+    case 'Z':
+        //Se incrementa el valor del parámetro actual del objeto jerárquico
+        obj->incrementaParamAct();
+        break;
+
+    case 'z':
+        //Se incrementa el valor del parámetro actual del objeto jerárquico
+        obj->decrementaParamAct();
+        break;
+
+    case '>':
+        //Se incrementa el valor de incremento/decremento usado para las animaciones y las modificaciones del parámetro actual
+        obj->acelerar();
+        break;
+
+    case '<':
+        //Se decrementa el valor de incremento/decremento usado para las animaciones y las modificaciones del parámetro actual
+        obj->decelerar();
+        break;
+        break;
+
+    case 'v':
     case 'V':
         //Se cambia el modo de dibujo de inmediato a diferido
         if (!modo_draw)
         {
             cout << "Se cambia el modo de dibujo a inmediato " << endl;
             modo_draw = true;
-            cubo->draw(modo_draw);
-            tetraedro->draw(modo_draw);
-            ply->draw(modo_draw);
-            cilindro->draw(modo_draw);
-            esfera->draw(modo_draw);
-            peon->draw(modo_draw);
-
+            cubo->draw(modo_dibujo, modo_draw);
+            tetraedro->draw(modo_dibujo, modo_draw);
+            ply->draw(modo_dibujo, modo_draw);
+            cilindro->draw(modo_dibujo, modo_draw);
+            esfera->draw(modo_dibujo, modo_draw);
+            peon->draw(modo_dibujo, modo_draw);
+            obj->draw(modo_dibujo, modo_draw);
         }
         else
         {
             cout << "Se cambia el modo de dibujo a diferido" << endl;
             modo_draw = false;
-            cubo->draw(modo_draw);
-            tetraedro->draw(modo_draw);
-            ply->draw(modo_draw);
-            cilindro->draw(modo_draw);
-            esfera->draw(modo_draw);
-            cono->draw(modo_draw);
-            peon->draw(modo_draw);
+            cubo->draw(modo_dibujo, modo_draw);
+            tetraedro->draw(modo_dibujo, modo_draw);
+            ply->draw(modo_dibujo, modo_draw);
+            cilindro->draw(modo_dibujo, modo_draw);
+            esfera->draw(modo_dibujo, modo_draw);
+            peon->draw(modo_dibujo, modo_draw);
+            obj->draw(modo_dibujo, modo_draw);
         }
         break;
     }
@@ -313,4 +334,29 @@ void Escena::change_observer()
     glTranslatef(0.0, 0.0, -Observer_distance);
     glRotatef(Observer_angle_x, 1.0, 0.0, 0.0);
     glRotatef(Observer_angle_y, 0.0, 1.0, 0.0);
+}
+
+void Escena::mgeDesocupado()
+{
+    obj->actualizarEstado();
+    glutPostRedisplay();
+}
+
+
+void Escena::conmutarAnimaciones()
+{
+    if(objeto_actual == 7)
+    {
+        animacion? animacion=false : animacion=true;
+
+        if(animacion)
+        {
+            obj->inicioAnimaciones();
+            glutIdleFunc( funcion_desocupado );
+        }
+        else
+        {
+            glutIdleFunc( nullptr );
+        }
+    }
 }
