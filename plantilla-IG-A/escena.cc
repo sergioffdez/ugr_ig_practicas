@@ -82,30 +82,7 @@ void Escena::dibujar_objeto_actual()
         break;
     case 3:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Se elige entre tetraedro o cubo y se pinta su modo ajedrez
-        switch (objeto_actual)
-        {
-        case 0:
-            cubo->ModoAjedrez();
-            break;
-        case 1:
-            tetraedro->ModoAjedrez();
-            break;
-        case 2:
-            ply->ModoAjedrez();
-            break;
-        case 3:
-            cilindro->ModoAjedrez();
-            break;
-        case 4:
-            esfera->ModoAjedrez();
-            break;
-        case 5:
-            cono->ModoAjedrez();
-            break;
-        case 6:
-            peon->ModoAjedrez();
-            break;
-        }
+        break;
     }
 
     // (2) dibujar el objeto actual usando método 'draw' del objeto asociado al
@@ -145,6 +122,7 @@ void Escena::dibujar_objeto_actual()
         if (obj != nullptr)
             obj->draw(modo_dibujo, modo_draw);
         break;
+
     default:
         cout << "draw_object: el número de objeto actual (" << objeto_actual << ") es incorrecto." << endl;
         break;

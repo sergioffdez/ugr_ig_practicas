@@ -14,7 +14,7 @@
 #define OBJETOS_H_INCLUDED
 
 #include "aux.h"
-#include<cmath>
+#include <cmath>
 
 // *****************************************************************************
 //
@@ -25,10 +25,9 @@
 class ObjMallaIndexada
 {
 public:
-
-  std::vector<Tupla3f> colores;    // una terna de 3 floats para cada color RGB
+  std::vector<Tupla3f> colores; // una terna de 3 floats para cada color RGB
   // dibuja el objeto en modo inmediato
-  void draw_ModoInmediato();
+  void draw_ModoInmediato(int modo_vis);
 
   // dibuja el objeto en modo diferido (usando VBOs)
   void draw_ModoDiferido();
@@ -61,7 +60,7 @@ protected:
   GLuint id_vbo_tri = 0;
 
   void calcular_normales(const std::vector<Tupla3f> perfil, int rotaciones,
-                         const std::vector<Tupla3f> &vertices);               // calcula tabla de normales de vértices (práctica 3)
+                         const std::vector<Tupla3f> &vertices); // calcula tabla de normales de vértices (práctica 3)
   void TablaTriangulos(const std::vector<Tupla3f> perfil, int rotaciones,
                        const std::vector<Tupla3i> &triangulos);
 
@@ -114,20 +113,20 @@ public:
 
 class Cilindro : public ObjRevolucion
 {
-  public:
-    Cilindro(const std::string &nombre_ply_perfil);
+public:
+  Cilindro(const std::string &nombre_ply_perfil);
 };
 
 class Cono : public ObjRevolucion
 {
-  public:
-    Cono(const std::string &nombre_ply_perfil);
+public:
+  Cono(const std::string &nombre_ply_perfil);
 };
 
 class Esfera : public ObjRevolucion
 {
-  public:
-    Esfera(const std::string &nombre_ply_perfil);
+public:
+  Esfera(const std::string &nombre_ply_perfil);
 };
 
 #endif
