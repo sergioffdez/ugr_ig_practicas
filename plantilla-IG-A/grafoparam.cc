@@ -34,7 +34,7 @@ void GrafoParam::actualizarValorEfe(const unsigned iparam, const float valor_na)
     case 0:
         // altura 1: oscila entre 0.7 y 1.3, a 0.5 oscilaciones por segundo
         // inicialmente es 1.0 (media de los valores extremos)
-        altura_1 = 1.0 + 0.3 * sin(0.5 * (2.0 * M_PI * valor_na));
+        altura_1 = 0.0 + 1 * sin(0.3 * (2.0 * M_PI * valor_na));
         break;
     case 1:
         // altura 2: oscila a 0.3 oscilaciones por segundo
@@ -43,7 +43,7 @@ void GrafoParam::actualizarValorEfe(const unsigned iparam, const float valor_na)
     case 2:
         // angulo en grados de rotacion 1 (cubo rojoaa)
         // crece linealmente a 150 grados por segundo, inicialmente es 20 grados
-        ag_rotacion_1 = 20.0 + 100.0 * valor_na;
+        ag_rotacion_1 = 0.0 - 180.0 * sin (0.3 * (2.0 * M_PI *valor_na));
         break;
     case 3:
         // ángulo en grados de rotacion 2 (cubo azul)
@@ -266,12 +266,15 @@ void GrafoParam::cabina_brazo()
 
 void GrafoParam::grua()
 {
-    glPushMatrix();
-        cabina_brazo();
-    glPopMatrix();
+     glPushMatrix();
+        glTranslatef(altura_1, 0.0, 0.0);
+        glPushMatrix();
+            cabina_brazo();
+        glPopMatrix();
 
-    glPushMatrix();
-        pie();
+        glPushMatrix();
+            pie();
+        glPopMatrix();
     glPopMatrix();
 }
 
