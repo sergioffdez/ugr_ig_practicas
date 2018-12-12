@@ -15,6 +15,10 @@
 
 #include "aux.h"
 #include <cmath>
+#define cimg_display 0
+#include "CImg.h"
+
+using namespace cimg_library;
 
 // *****************************************************************************
 //
@@ -22,10 +26,26 @@
 //
 // *****************************************************************************
 
+struct Material
+{
+  Tupla4f difuso;	
+  Tupla4f especular;
+  Tupla4f ambiente;
+  float brillo;
+};
+
+struct ParametrosLuz
+{
+  Tupla4f luz_punto; //posicion luz, según sea el ultimo componente 1 o 0
+  Tupla4f luz_ambiente; //componente ambiental 
+  Tupla4f luz_difusa; //componente difuso
+  Tupla4f luz_especular; //componente especular
+};
+
 class ObjMallaIndexada
 {
 public:
-  std::vector<Tupla3f> colores; // una terna de 3 floats para cada color RGB
+  
   // dibuja el objeto en modo inmediato
   void draw_ModoInmediato(int modo_vis);
 
@@ -38,6 +58,11 @@ public:
   // está función llama a 'draw_MI' (modo inmediato)
   // o bien a 'draw_MD' (modo diferido, VBOs)
   void draw(int modo_vis, bool selecciona);
+
+  void activarMaterial(int indice);
+  void addMaterial(Tupla4f mat_difuso, Tupla4f mat_especular, Tupla4f mat_ambiente, float mat_brillo);
+  void cargarImagen();
+  void textura();
 
   //Dibuja el modo ajedrez
   void ModoAjedrez();
@@ -59,13 +84,25 @@ protected:
   GLuint id_vbo_ver = 0;
   GLuint id_vbo_tri = 0;
 
-  void calcular_normales(const std::vector<Tupla3f> perfil, int rotaciones,
-                         const std::vector<Tupla3f> &vertices); // calcula tabla de normales de vértices (práctica 3)
+  void TablaVertices(const std::vector<Tupla3f> perfil, int rotaciones,
+                         const std::vector<Tupla3f> &vertices); 
   void TablaTriangulos(const std::vector<Tupla3f> perfil, int rotaciones,
                        const std::vector<Tupla3i> &triangulos);
 
+  void calcular_normales();
+
   std::vector<Tupla3f> vertices;   // tabla de coordenadas de vértices (una tupla por vértice, con tres floats)
   std::vector<Tupla3i> triangulos; // una terna de 3 enteros por cada cara o triángulo
+  std::vector<Tupla3f> colores;
+  std::vector<Tupla3f> normalesVertices;
+  std::vector<Tupla2f> texturas;
+  std::vector<Material> material;
+
+  GLuint textura_id;
+  int alto;
+  int ancho;
+  std::vector<unsigned char> pixel;
+  
 
   // completar: tabla de colores, tabla de normales de vértices
 };
@@ -79,6 +116,12 @@ protected:
 // *****************************************************************************
 // Cubo con centro en el origen y lado unidad
 // (tiene 9 vertices y 6 caras)
+
+class Cuadro : public ObjMallaIndexada
+{
+  public: 
+    Cuadro();
+};
 
 class Cubo : public ObjMallaIndexada
 {
@@ -128,5 +171,22 @@ class Esfera : public ObjRevolucion
 public:
   Esfera(const std::string &nombre_ply_perfil);
 };
+
+class Luz {
+  public:
+      Luz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular);
+      void activar();
+      void desactivar();
+      void incrementarAngulo();
+      void addLuz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular);
+
+   protected:
+      std::vector<ParametrosLuz> param_luz;
+      std::vector<GLenum> indice_luz = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7}; //indice de la luz, LIGHT0-LIGHT7
+      GLdouble matriz_identidad[16] = {1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,1};
+      float angulo;
+
+};
+
 
 #endif

@@ -19,7 +19,12 @@ Escena::Escena()
 
     ejes.changeAxisSize(5000);
 
+    Tupla4f difusa = {1.0, 1.0, 1.0, 1.0};
+    Tupla4f magenta = {1.0, 0.0, 1.0, 1.0};
+
+
     // crear los objetos de las prácticas: Mallas o Jerárquicos....
+
     cubo = new Cubo();
 
     tetraedro = new Tetraedro();
@@ -36,10 +41,20 @@ Escena::Escena()
 
     obj = new ObjJerarquico();
 
+    luces = new Luz({30.0, 30.0, 30.0, 0.0}, difusa, difusa, difusa);
+
+    luces->addLuz({30.0, 3.0, 3.0, 1.0}, {0.0, 0.0, 1.0, 1.0}, magenta, magenta);
+
+    cuadro = new Cuadro();
+
+    malla.addMaterial({0.0, 0.50980392, 0.50980392, 1.0}, {0.50196078, 0.50196078, 0.50196078, 1.0}, {0.0, 0.1, 0.06, 1.0}, 0.25);
+    malla.addMaterial({0.50754, 0.50754, 0.50754, 1.0}, {0.508273, 0.508273, 0.508273, 1.0}, {0.19225, 0.19225, 0.19225, 1.0}, 0.4);
+    malla.addMaterial({0.75164, 0.60648, 0.22648, 1.0}, {0.628281, 0.555802, 0.366065, 1.0}, {0.24725, 0.1995, 0.0745, 1.0}, 0.4);
+    nMateriales = 3;
     // .......completar: ...
     // .....
 
-    num_objetos = 8; // se usa al pulsar la tecla 'O' (rotar objeto actual)
+    num_objetos = 9; // se usa al pulsar la tecla 'O' (rotar objeto actual)
 }
 
 //**************************************************************************
@@ -66,6 +81,19 @@ void Escena::dibujar_objeto_actual()
 {
     using namespace std;
 
+    if(modo_draw && modo_dibujo==3)
+        modo_dibujo = modo_dibujo-2;
+
+    if(activar_luz)
+        luces->activar();
+    else
+        luces->desactivar();
+
+    if(activar_textura)
+        glEnable(GL_TEXTURE_2D);
+    else
+        glDisable(GL_TEXTURE_2D);
+
     switch (modo_dibujo)
     {
     case 0:
@@ -74,8 +102,15 @@ void Escena::dibujar_objeto_actual()
     case 1:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Pinta en modo relleno
         glEnableClientState(GL_COLOR_ARRAY);
+
+        if(!modo_shade)
+            glShadeModel(GL_SMOOTH);
+        else
+            glShadeModel(GL_FLAT);
+
         break;
     case 2:
+        
         glDisableClientState(GL_COLOR_ARRAY);
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); //Pinta en modo puntos
         glPointSize(5);
@@ -91,8 +126,10 @@ void Escena::dibujar_objeto_actual()
     switch (objeto_actual)
     {
     case 0:
-        if (cubo != nullptr)
+        if (cubo != nullptr){
+            glDisable(GL_TEXTURE_2D);
             cubo->draw(modo_dibujo, modo_draw);
+        }
         break;
     case 1:
         if (tetraedro != nullptr)
@@ -103,12 +140,14 @@ void Escena::dibujar_objeto_actual()
             ply->draw(modo_dibujo, modo_draw);
         break;
     case 3:
-        if (cilindro != nullptr)
+        if (cilindro != nullptr){
             cilindro->draw(modo_dibujo, modo_draw);
+        }
         break;
     case 4:
-        if (esfera != nullptr)
+        if (esfera != nullptr){
             esfera->draw(modo_dibujo, modo_draw);
+        }
         break;
     case 5:
         if (cono != nullptr)
@@ -121,6 +160,12 @@ void Escena::dibujar_objeto_actual()
     case 7:
         if (obj != nullptr)
             obj->draw(modo_dibujo, modo_draw);
+        break;
+    case 8:
+        if (cuadro != nullptr){
+            cuadro->draw(modo_dibujo, modo_draw);
+            cuadro->textura();
+        }
         break;
 
     default:
@@ -140,9 +185,11 @@ void Escena::dibujar()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpiar la pantalla
     glEnable(GL_CULL_FACE);
+    glEnable(GL_NORMALIZE);
     change_observer();
     ejes.draw();
     dibujar_objeto_actual();
+    
 }
 
 //**************************************************************************
@@ -188,8 +235,39 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
     case 'a':
     case 'A':
         //Activa o desactiva las animaciones
-        conmutarAnimaciones();
+        if(obj != nullptr && objeto_actual == 7)
+        {
+            animacion? animacion=false : animacion=true;
+            this->conmutarAnimaciones();
+        }
         break;
+    
+    case 'i':
+    case 'I':
+        luz? luz=false : luz=true;
+        this->conmutarAnimacionesLuz();
+        break;
+
+    case 'x':
+    case 'X':
+            num_material = (num_material + 1) % nMateriales;
+            malla.activarMaterial(num_material);
+        break;
+
+    case 'l':
+    case 'L':
+            activar_luz = !activar_luz;
+        break;
+
+    case 't':
+    case 'T':
+            if(objeto_actual==8)
+                activar_textura = !activar_textura;
+        break;
+
+    case 's':
+    case 'S':
+        modo_shade = !modo_shade;
 
     case 'Z':
         //Se incrementa el valor del parámetro actual del objeto jerárquico
@@ -214,30 +292,13 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
 
     case 'v':
     case 'V':
-        //Se cambia el modo de dibujo de inmediato a diferido
-        if (!modo_draw)
-        {
-            cout << "Se cambia el modo de dibujo a inmediato " << endl;
+         if(!modo_draw){
+            cout << "Se cambia el modo de dibujo a diferido " << endl;
             modo_draw = true;
-            cubo->draw(modo_dibujo, modo_draw);
-            tetraedro->draw(modo_dibujo, modo_draw);
-            ply->draw(modo_dibujo, modo_draw);
-            cilindro->draw(modo_dibujo, modo_draw);
-            esfera->draw(modo_dibujo, modo_draw);
-            peon->draw(modo_dibujo, modo_draw);
-            obj->draw(modo_dibujo, modo_draw);
-        }
-        else
-        {
-            cout << "Se cambia el modo de dibujo a diferido" << endl;
-            modo_draw = false;
-            cubo->draw(modo_dibujo, modo_draw);
-            tetraedro->draw(modo_dibujo, modo_draw);
-            ply->draw(modo_dibujo, modo_draw);
-            cilindro->draw(modo_dibujo, modo_draw);
-            esfera->draw(modo_dibujo, modo_draw);
-            peon->draw(modo_dibujo, modo_draw);
-            obj->draw(modo_dibujo, modo_draw);
+         }
+        else{
+            cout << "Se cambia el modo de dibujo a inmediato " << endl;
+            modo_draw=false;
         }
         break;
     }
@@ -316,25 +377,33 @@ void Escena::change_observer()
 
 void Escena::mgeDesocupado()
 {
-    obj->actualizarEstado();
+    if (objeto_actual == 7 && animacion)
+        obj->actualizarEstado();
+
+    if (glIsEnabled(GL_LIGHTING) == GL_TRUE)
+        luces->incrementarAngulo();
+
     glutPostRedisplay();
 }
 
-
 void Escena::conmutarAnimaciones()
 {
-    if(objeto_actual == 7)
+    if (animacion)
     {
-        animacion? animacion=false : animacion=true;
-
-        if(animacion)
-        {
-            obj->inicioAnimaciones();
-            glutIdleFunc( funcion_desocupado );
-        }
-        else
-        {
-            glutIdleFunc( nullptr );
-        }
+        obj->inicioAnimaciones();
+        glutIdleFunc(funcion_desocupado);
+    }
+    else
+    {
+        glutIdleFunc(nullptr);
     }
 }
+
+void Escena::conmutarAnimacionesLuz()
+{
+    if (luz)
+        glutIdleFunc(funcion_desocupado);
+    else
+        glutIdleFunc(nullptr);
+}
+

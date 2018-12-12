@@ -4,6 +4,10 @@
 #include "aux.h"
 #include "ply_reader.h"
 #include "malla.h"
+#define cimg_display 0
+#include "CImg.h"
+
+using namespace cimg_library;
 
 // *****************************************************************************
 //
@@ -15,32 +19,55 @@
 
 void ObjMallaIndexada::draw_ModoInmediato(int modo_vis)
 {
-	// habilitar uso de un array de vértices
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+
+	if (glIsEnabled(GL_LIGHTING) == GL_TRUE){
+		glEnableClientState(GL_NORMAL_ARRAY);
+    	glNormalPointer(GL_FLOAT, 0, normalesVertices.data());
+	}
+
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+    	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
+  	}
+	// habilitar uso de un array de vértices
 
 	// indicar el formato y la dirección de memoria del array de vértices
 	// (son tuplas de 3 valores float, sin espacio entre ellas)
-	glVertexPointer(3, GL_FLOAT, 0, vertices.data());
 
 	if (modo_vis == 3)
-	{
 		ModoAjedrez();
-	}
 	else
-	{
 		// visualizar, indicando: tipo de primitiva, número de índices,
 		// tipo de los índices, y dirección de la tabla de índices
 		glDrawElements(GL_TRIANGLES, triangulos.size() * 3, GL_UNSIGNED_INT, triangulos.data());
-	}
+
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE)
+  	{
+    	glDisable(GL_TEXTURE_2D);
+    	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
 
 	// deshabilitar array de vértices
 	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 }
 // -----------------------------------------------------------------------------
 // Visualización en modo diferido con 'glDrawElements' (usando VBOs)
 
 void ObjMallaIndexada::draw_ModoDiferido()
 {
+
+	if (glIsEnabled(GL_LIGHTING) == GL_TRUE){
+		glEnableClientState(GL_NORMAL_ARRAY);
+    	glNormalPointer(GL_FLOAT, 0, normalesVertices.data());
+	}
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+    	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
+  	}
+	  
 	if (id_vbo_ver == 0)
 		id_vbo_ver = CrearVBO(GL_ARRAY_BUFFER, vertices.size() * 3 * sizeof(float), vertices.data());
 
@@ -58,6 +85,10 @@ void ObjMallaIndexada::draw_ModoDiferido()
 	glDrawElements(GL_TRIANGLES, 3 * triangulos.size(), GL_UNSIGNED_INT, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // desactivar VBO de triángulos
 
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+    	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
+  	}
 	// desactivar uso de array de vértices
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -150,7 +181,7 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
 	this->triangulos.clear();
 
 	//Calculamos la tabla de vertices.
-	calcular_normales(perfil, rotaciones, vertices);
+	TablaVertices(perfil, rotaciones, vertices);
 
 	//Calculamos la tabla de triangulos
 	TablaTriangulos(perfil, rotaciones, triangulos);
@@ -161,7 +192,7 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
 	{
 		this->vertices.push_back({0.0, ver1[1], 0.0});
 
-		for (int i = 0; i + perfil.size() < vertices.size(); i += perfil.size())
+		for (auto i = 0; i + perfil.size() < vertices.size(); i += perfil.size())
 			this->triangulos.push_back({i, vertices.size() - 1, (i + perfil.size()) % (vertices.size() - 1)});
 	}
 
@@ -171,7 +202,7 @@ void ObjMallaIndexada::CrearMalla(const std::vector<Tupla3f> perfil, const int r
 	{
 		this->vertices.push_back({0.0, ver2[1], 0.0});
 
-		for (int i = perfil.size() - 1; i < vertices.size() - 1; i += perfil.size())
+		for (auto i = perfil.size() - 1; i < vertices.size() - 1; i += perfil.size())
 		{
 			this->triangulos.push_back({vertices.size() - 1, i, (i + perfil.size()) % (vertices.size() - 2)});
 			aux = i;
@@ -184,9 +215,9 @@ void ObjMallaIndexada::ColorearObjeto()
 {
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		colores.push_back({0.0, 0.0, 0.0});
-		colores.push_back({1.0, 1.0, 1.0});
-		colores.push_back({0.0, 0.0, 0.0});
+		colores.push_back({1.0, 0.0, 1.0});
+		colores.push_back({1.0, 1.0, 0.0});
+		colores.push_back({0.0, 1.0, 1.0});
 	}
 }
 
@@ -198,7 +229,7 @@ std::vector<Tupla3f> ObjMallaIndexada::getColores()
 // -----------------------------------------------------------------------------
 // Recalcula la tabla de normales de vértices (el contenido anterior se pierde)
 
-void ObjMallaIndexada::calcular_normales(const std::vector<Tupla3f> perfil, int rotaciones,
+void ObjMallaIndexada::TablaVertices(const std::vector<Tupla3f> perfil, int rotaciones,
 										 const std::vector<Tupla3f> &vertices)
 {
 	//this->vertices.clear();
@@ -235,6 +266,30 @@ void ObjMallaIndexada::TablaTriangulos(const std::vector<Tupla3f> perfil, int ro
 	}
 }
 
+void ObjMallaIndexada::calcular_normales()
+{
+	normalesVertices.clear();
+	normalesVertices.resize(triangulos.size());
+
+	Tupla3f vector_1, vector_2, prod_vect;
+
+	//Obtener 2 vectores en la cara y hacer producto vectorial
+	for (unsigned int i=0;i<triangulos.size();i++)
+  	{
+		vector_1 = vertices[triangulos[i][1]] - vertices[triangulos[i][0]];
+		vector_2 = vertices[triangulos[i][2]] - vertices[triangulos[i][0]];
+		prod_vect = vector_1.cross(vector_2);
+
+		normalesVertices[triangulos[i][0]]= normalesVertices[triangulos[i][0]] + prod_vect;
+    	normalesVertices[triangulos[i][1]]= normalesVertices[triangulos[i][1]] + prod_vect;
+    	normalesVertices[triangulos[i][2]]= normalesVertices[triangulos[i][2]] + prod_vect;
+	}
+
+	for (unsigned int i=0;i<vertices.size(); i++)
+    	normalesVertices[i] = normalesVertices[i].normalized();
+
+}
+
 // *****************************************************************************
 //
 // Clase Cubo (práctica 1)
@@ -263,6 +318,8 @@ Cubo::Cubo()
 	triangulos = {{0, 2, 4}, {4, 2, 6}, {1, 5, 3}, {3, 5, 7}, {1, 3, 0}, {0, 3, 2}, {5, 4, 7}, {7, 4, 6}, {1, 0, 5}, {5, 0, 4}, {3, 7, 2}, {2, 7, 6}};
 
 	ColorearObjeto();
+
+	calcular_normales();
 }
 
 // *****************************************************************************
@@ -284,6 +341,8 @@ Tetraedro::Tetraedro()
 	triangulos = {{0, 1, 2}, {0, 3, 1}, {0, 2, 3}, {1, 3, 2}};
 
 	ColorearObjeto();
+
+	calcular_normales();
 }
 
 // *****************************************************************************
@@ -298,6 +357,8 @@ ObjPLY::ObjPLY(const std::string &nombre_archivo)
 	ply::read(nombre_archivo, vertices, triangulos);
 
 	ColorearObjeto();
+
+	calcular_normales();
 }
 
 std::vector<Tupla3f> ObjPLY::getVertices()
@@ -323,6 +384,8 @@ ObjRevolucion::ObjRevolucion(const std::string &nombre_ply_perfil)
 	CrearMalla(perfil, 50, vertices, triangulos);
 
 	ColorearObjeto();
+
+	calcular_normales();
 }
 
 Cilindro::Cilindro(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil) {}
@@ -330,3 +393,157 @@ Cilindro::Cilindro(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_
 Cono::Cono(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil) {}
 
 Esfera::Esfera(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil) {}
+
+Luz::Luz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular)
+{
+	ParametrosLuz pm;
+	for(int i=0; i<4; i++)
+	{
+		pm.luz_punto[i] = luzPunto(i);
+ 		pm.luz_ambiente[i] = luzAmbiente(i);
+  		pm.luz_difusa[i] = luzDifusa(i);
+  		pm.luz_especular[i] = luzEspecular(i);
+	}
+
+	param_luz.push_back(pm);
+}
+
+void Luz::activar()
+{
+	glEnable(GL_LIGHTING);
+
+	for (int i=0; i<param_luz.size(); i++)
+	{
+		glEnable(indice_luz[i]);
+
+		glLightfv(indice_luz[i], GL_AMBIENT, (GLfloat*) &param_luz[i].luz_ambiente);
+		glLightfv(indice_luz[i], GL_DIFFUSE, (GLfloat*) &param_luz[i].luz_difusa);
+		glLightfv(indice_luz[i], GL_SPECULAR, (GLfloat*) &param_luz[i].luz_especular);
+
+	if(i == 1)
+	{
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+			glLoadIdentity();
+			glMultMatrixd(matriz_identidad);
+			glRotatef(angulo, 0.0, 1.0, 0.0);
+			glLightfv(indice_luz[i], GL_POSITION, (GLfloat*) &param_luz[i].luz_punto);
+		glPopMatrix();
+	}
+	else
+		glLightfv(indice_luz[i], GL_POSITION, (GLfloat*) &param_luz[i].luz_punto);
+	}
+}
+
+void Luz::desactivar()
+{
+	glDisable(GL_LIGHTING);
+}
+
+void Luz::incrementarAngulo()
+{
+	angulo = angulo + 0.25;
+}
+
+void Luz::addLuz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular)
+{
+	ParametrosLuz pm;
+	for(int i=0; i<4; i++)
+	{
+		pm.luz_punto[i] = luzPunto(i);
+ 		pm.luz_ambiente[i] = luzAmbiente(i);
+  		pm.luz_difusa[i] = luzDifusa(i);
+  		pm.luz_especular[i] = luzEspecular(i);
+	}
+
+	param_luz.push_back(pm);
+}
+
+void ObjMallaIndexada::activarMaterial(int indice)
+{
+	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, material[indice].ambiente);
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, material[indice].difuso);
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, material[indice].especular);
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, material[indice].brillo * 128.0);
+}
+
+void ObjMallaIndexada::addMaterial(Tupla4f mat_difuso, Tupla4f mat_especular, Tupla4f mat_ambiente, float mat_brillo)
+{
+	Material mat;
+	for(int i=0; i<4; i++)
+	{
+		mat.difuso[i] = mat_difuso(i);
+ 		mat.especular[i] = mat_especular(i);
+  		mat.ambiente[i] = mat_ambiente(i);
+	}
+  		mat.brillo = mat_brillo;
+
+	material.push_back(mat);
+}
+
+Cuadro::Cuadro()
+{
+	vertices = {
+		{-0.5, -0.5, 0.0},
+		{0.5, -0.5, 0.0},
+		{0.5, 0.5, 0.0},
+		{-0.5, 0.5, 0.0}
+	};
+
+	triangulos = {{0, 2, 3}, {0, 1, 2}};
+
+	ColorearObjeto();
+	calcular_normales();
+	cargarImagen();
+
+	texturas = {{0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0}, {0.0, 0.0}};
+}
+
+void ObjMallaIndexada::cargarImagen()
+{
+	CImg<unsigned char> imagen;
+	unsigned char *x, *y, *z;
+
+	imagen.load("imagenes/imagen.jpg");
+
+	for(int i=0; i<imagen.height(); i++)
+	{
+		for(int j=0; j<imagen.width(); j++)
+		{
+			unsigned char *x=imagen.data(j, i, 0, 0);
+			unsigned char *y=imagen.data(j, i, 0, 1);
+			unsigned char *z=imagen.data(j, i, 0, 2);
+
+			pixel.push_back(*x);
+			pixel.push_back(*y);
+			pixel.push_back(*z);
+		}
+	}
+
+	this->ancho = imagen.width();
+	this->alto = imagen.height();
+}
+
+void ObjMallaIndexada::textura()
+{
+  glEnable(GL_TEXTURE_2D);
+
+  glGenTextures(1, &textura_id);
+  glBindTexture(GL_TEXTURE_2D, textura_id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  /*glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+  glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+  glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
+*/
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
+  // TRASFIERE LOS DATOS A GPU
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel.data());
+}
+
+
+

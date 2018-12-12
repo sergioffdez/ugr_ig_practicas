@@ -14,6 +14,8 @@ class Escena
   private:
     Ejes ejes;
     bool animacion = false;
+    bool luz = false;
+    bool textura_activada = false;
 
     // variables que definen la posicion de la camara en coordenadas polares
     GLfloat Observer_distance;
@@ -31,12 +33,20 @@ class Escena
     void change_observer();
 
     void conmutarAnimaciones();
+    void conmutarAnimacionesLuz();
 
     int objeto_actual = 0, // objeto actual (el que se visualiza)
         num_objetos = 0,   // número de objetos (actualizado al crear los objetos en el constructor)
-        modo_dibujo = 0;
+        modo_dibujo = 0,
+        num_material = 0,
+        nMateriales = 0;
+
+    ObjMallaIndexada malla;
 
     bool modo_draw = false;
+    bool modo_shade = false;
+    bool activar_luz = false;
+    bool activar_textura = false;
 
     // Objetos de la escena
     Cubo *cubo = nullptr; // es importante inicializarlo a 'nullptr'
@@ -47,6 +57,8 @@ class Escena
     Esfera *esfera = nullptr;
     ObjRevolucion *peon = nullptr;
     ObjJerarquico *obj = nullptr;
+    Luz *luces = nullptr;
+    Cuadro *cuadro = nullptr;
 
   public:
     Escena();
