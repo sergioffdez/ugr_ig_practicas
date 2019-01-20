@@ -7,6 +7,7 @@
 #include "ejes.h"
 #include "malla.h"
 #include "jerarquico.h"
+#include "camara.h"
 
 class Escena
 {
@@ -21,6 +22,17 @@ class Escena
     GLfloat Observer_distance;
     GLfloat Observer_angle_x;
     GLfloat Observer_angle_y;
+
+    //CAMARAS
+    int tipo_camara = 0;
+    float xmouse;
+    float ymouse;
+    float zoom_mouse;
+
+    bool se_mueve_camara = false;
+    bool se_hace_zoom = false;
+
+    std::vector<Camara> camaras;
 
     // variables que controlan la ventana y la transformacion de perspectiva
     GLfloat Width, Height, Front_plane, Back_plane;
@@ -47,6 +59,11 @@ class Escena
     bool modo_shade = false;
     bool activar_luz = false;
     bool activar_textura = false;
+    bool cambio = false;
+
+    std::vector<Tupla3i> color_obj;
+    std::vector<int> vector_cambio = {0, 0, 0, 0};
+
 
     // Objetos de la escena
     Cubo *cubo = nullptr; // es importante inicializarlo a 'nullptr'
@@ -57,7 +74,7 @@ class Escena
     Esfera *esfera = nullptr;
     ObjRevolucion *peon = nullptr;
     ObjJerarquico *obj = nullptr;
-    Luz *luces = nullptr;
+    //Luz *luces = nullptr;
     Cuadro *cuadro = nullptr;
 
   public:
@@ -68,9 +85,17 @@ class Escena
     // Dibujar
     void dibujar();
 
+    void dibujaSeleccion();
+    void dibujaSeleccionFalso();
+    void pick_color(int x, int y);
+    void procesar_color(int indice);
+
     // Interacción con la escena
     bool teclaPulsada(unsigned char Tecla1, int x, int y);
     void teclaEspecial(int Tecla1, int x, int y);
+
+    void clickRaton(int boton, int estado, int x, int y);
+    void ratonMovido(int x, int y);
 
     void mgeDesocupado();
 };

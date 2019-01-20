@@ -27,10 +27,10 @@ void ObjMallaIndexada::draw_ModoInmediato(int modo_vis)
     	glNormalPointer(GL_FLOAT, 0, normalesVertices.data());
 	}
 
-	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+	/*if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
     	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
-  	}
+  	}*/
 	// habilitar uso de un array de vértices
 
 	// indicar el formato y la dirección de memoria del array de vértices
@@ -43,11 +43,11 @@ void ObjMallaIndexada::draw_ModoInmediato(int modo_vis)
 		// tipo de los índices, y dirección de la tabla de índices
 		glDrawElements(GL_TRIANGLES, triangulos.size() * 3, GL_UNSIGNED_INT, triangulos.data());
 
-	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE)
+	/*if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE)
   	{
     	glDisable(GL_TEXTURE_2D);
     	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
+    }*/
 
 	// deshabilitar array de vértices
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -63,10 +63,10 @@ void ObjMallaIndexada::draw_ModoDiferido()
 		glEnableClientState(GL_NORMAL_ARRAY);
     	glNormalPointer(GL_FLOAT, 0, normalesVertices.data());
 	}
-	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+	/*if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
     	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
-  	}
+	}	*/
 	  
 	if (id_vbo_ver == 0)
 		id_vbo_ver = CrearVBO(GL_ARRAY_BUFFER, vertices.size() * 3 * sizeof(float), vertices.data());
@@ -85,10 +85,10 @@ void ObjMallaIndexada::draw_ModoDiferido()
 	glDrawElements(GL_TRIANGLES, 3 * triangulos.size(), GL_UNSIGNED_INT, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // desactivar VBO de triángulos
 
-	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
+	/*if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE){
     	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     	glTexCoordPointer( 2, GL_FLOAT, 0, texturas.data());
-  	}
+  	}*/
 	// desactivar uso de array de vértices
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -113,7 +113,7 @@ GLuint ObjMallaIndexada::CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid 
 
 void ObjMallaIndexada::draw(int modo_vis, bool selecciona)
 {
-	glColorPointer(3, GL_FLOAT, 0, colores.data());
+	//glColorPointer(3, GL_FLOAT, 0, colores.data());
 
 	if (!selecciona)
 		draw_ModoInmediato(modo_vis);
@@ -216,8 +216,8 @@ void ObjMallaIndexada::ColorearObjeto()
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		colores.push_back({1.0, 0.0, 1.0});
-		colores.push_back({1.0, 1.0, 0.0});
-		colores.push_back({0.0, 1.0, 1.0});
+		//colores.push_back({1.0, 1.0, 0.0});
+		//colores.push_back({0.0, 1.0, 1.0});
 	}
 }
 
@@ -266,7 +266,7 @@ void ObjMallaIndexada::TablaTriangulos(const std::vector<Tupla3f> perfil, int ro
 	}
 }
 
-void ObjMallaIndexada::calcular_normales()
+/*void ObjMallaIndexada::calcular_normales()
 {
 	normalesVertices.clear();
 	normalesVertices.resize(triangulos.size());
@@ -288,7 +288,7 @@ void ObjMallaIndexada::calcular_normales()
 	for (unsigned int i=0;i<vertices.size(); i++)
     	normalesVertices[i] = normalesVertices[i].normalized();
 
-}
+}*/
 
 // *****************************************************************************
 //
@@ -317,9 +317,9 @@ Cubo::Cubo()
 
 	triangulos = {{0, 2, 4}, {4, 2, 6}, {1, 5, 3}, {3, 5, 7}, {1, 3, 0}, {0, 3, 2}, {5, 4, 7}, {7, 4, 6}, {1, 0, 5}, {5, 0, 4}, {3, 7, 2}, {2, 7, 6}};
 
-	ColorearObjeto();
+	//ColorearObjeto();
 
-	calcular_normales();
+	//calcular_normales();
 }
 
 // *****************************************************************************
@@ -340,9 +340,9 @@ Tetraedro::Tetraedro()
 
 	triangulos = {{0, 1, 2}, {0, 3, 1}, {0, 2, 3}, {1, 3, 2}};
 
-	ColorearObjeto();
+	//ColorearObjeto();
 
-	calcular_normales();
+	//calcular_normales();
 }
 
 // *****************************************************************************
@@ -356,9 +356,9 @@ ObjPLY::ObjPLY(const std::string &nombre_archivo)
 	// leer la lista de caras y vértices
 	ply::read(nombre_archivo, vertices, triangulos);
 
-	ColorearObjeto();
+	//ColorearObjeto();
 
-	calcular_normales();
+	//calcular_normales();
 }
 
 std::vector<Tupla3f> ObjPLY::getVertices()
@@ -383,9 +383,9 @@ ObjRevolucion::ObjRevolucion(const std::string &nombre_ply_perfil)
 
 	CrearMalla(perfil, 50, vertices, triangulos);
 
-	ColorearObjeto();
+	//ColorearObjeto();
 
-	calcular_normales();
+	//calcular_normales();
 }
 
 Cilindro::Cilindro(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil) {}
@@ -394,7 +394,7 @@ Cono::Cono(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perf
 
 Esfera::Esfera(const std::string &nombre_ply_perfil) : ObjRevolucion(nombre_ply_perfil) {}
 
-Luz::Luz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular)
+/*Luz::Luz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular)
 {
 	ParametrosLuz pm;
 	for(int i=0; i<4; i++)
@@ -479,7 +479,7 @@ void ObjMallaIndexada::addMaterial(Tupla4f mat_difuso, Tupla4f mat_especular, Tu
   		mat.brillo = mat_brillo;
 
 	material.push_back(mat);
-}
+}*/
 
 Cuadro::Cuadro()
 {
@@ -492,14 +492,14 @@ Cuadro::Cuadro()
 
 	triangulos = {{0, 2, 3}, {0, 1, 2}};
 
-	ColorearObjeto();
-	calcular_normales();
-	cargarImagen();
+	//ColorearObjeto();
+	//calcular_normales();
+	//cargarImagen();
 
-	texturas = {{0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0}, {0.0, 0.0}};
+	//texturas = {{0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0}, {0.0, 0.0}};
 }
 
-void ObjMallaIndexada::cargarImagen()
+/*void ObjMallaIndexada::cargarImagen()
 {
 	CImg<unsigned char> imagen;
 	unsigned char *x, *y, *z;
@@ -536,14 +536,14 @@ void ObjMallaIndexada::textura()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  /*glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
   glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
   glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
-*/
+
   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
   // TRASFIERE LOS DATOS A GPU
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel.data());
-}
+}*/
 
 
 
