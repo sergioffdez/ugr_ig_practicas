@@ -101,6 +101,15 @@ void funcion_desocupado()
 // Se encarga de iniciar la ventana, asignar las funciones e comenzar el
 // bucle de eventos
 //***************************************************************************
+void clickRaton (int boton, int estado, int x, int y)
+{
+   escena->clickRaton(boton, estado, x, y);
+}
+
+void ratonMovido(int x, int y)
+{
+   escena->ratonMovido(x, y);
+}
 
 int main( int argc, char **argv )
 {
@@ -118,10 +127,10 @@ int main( int argc, char **argv )
    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
    // variables que determninan la posicion y tamaño de la ventana X
-   const int UI_window_pos_x  = 0,
-             UI_window_pos_y  = 0,
-             UI_window_width  = 2000,
-             UI_window_height = 1000;
+   const int UI_window_pos_x  = 50,
+             UI_window_pos_y  = 50,
+             UI_window_width  = 800,
+             UI_window_height = 800;
 
    // posicion de la esquina inferior izquierdad de la ventana
    glutInitWindowPosition(UI_window_pos_x,UI_window_pos_y);
@@ -159,6 +168,8 @@ int main( int argc, char **argv )
    // funcion de inicialización de la escena (necesita que esté la ventana creada)
    escena->inicializar( UI_window_width, UI_window_height );
 
+   glutMouseFunc(clickRaton);
+   glutMotionFunc(ratonMovido);
    // TEST
 
    // ejecutar del bucle de eventos

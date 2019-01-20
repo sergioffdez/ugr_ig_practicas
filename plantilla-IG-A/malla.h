@@ -61,8 +61,8 @@ public:
 
   void activarMaterial(int indice);
   void addMaterial(Tupla4f mat_difuso, Tupla4f mat_especular, Tupla4f mat_ambiente, float mat_brillo);
-  void cargarImagen();
-  void textura();
+  //void cargarImagen();
+  //void textura();
 
   //Dibuja el modo ajedrez
   void ModoAjedrez();
@@ -89,7 +89,7 @@ protected:
   void TablaTriangulos(const std::vector<Tupla3f> perfil, int rotaciones,
                        const std::vector<Tupla3i> &triangulos);
 
-  void calcular_normales();
+  //void calcular_normales();
 
   std::vector<Tupla3f> vertices;   // tabla de coordenadas de vértices (una tupla por vértice, con tres floats)
   std::vector<Tupla3i> triangulos; // una terna de 3 enteros por cada cara o triángulo
@@ -172,7 +172,7 @@ public:
   Esfera(const std::string &nombre_ply_perfil);
 };
 
-class Luz {
+/*class Luz {
   public:
       Luz(Tupla4f luzPunto, Tupla4f luzAmbiente, Tupla4f luzDifusa, Tupla4f luzEspecular);
       void activar();
@@ -186,7 +186,7 @@ class Luz {
       GLdouble matriz_identidad[16] = {1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,1};
       float angulo;
 
-};
+};*/
 
 
 #endif

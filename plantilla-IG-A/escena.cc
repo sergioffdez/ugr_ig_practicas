@@ -22,6 +22,11 @@ Escena::Escena()
     Tupla4f difusa = {1.0, 1.0, 1.0, 1.0};
     Tupla4f magenta = {1.0, 0.0, 1.0, 1.0};
 
+    Camara camara_1({0.0, 0.0, 7.0}, 0);
+    Camara camara_2({0.0, 0.0, -7.0}, 1);
+
+    camaras.push_back(camara_1);
+    camaras.push_back(camara_2);
 
     // crear los objetos de las prácticas: Mallas o Jerárquicos....
 
@@ -41,7 +46,7 @@ Escena::Escena()
 
     obj = new ObjJerarquico();
 
-    luces = new Luz({30.0, 30.0, 30.0, 0.0}, difusa, difusa, difusa);
+    /*luces = new Luz({30.0, 30.0, 30.0, 0.0}, difusa, difusa, difusa);
 
     luces->addLuz({30.0, 3.0, 3.0, 1.0}, {0.0, 0.0, 1.0, 1.0}, magenta, magenta);
 
@@ -50,11 +55,13 @@ Escena::Escena()
     malla.addMaterial({0.0, 0.50980392, 0.50980392, 1.0}, {0.50196078, 0.50196078, 0.50196078, 1.0}, {0.0, 0.1, 0.06, 1.0}, 0.25);
     malla.addMaterial({0.50754, 0.50754, 0.50754, 1.0}, {0.508273, 0.508273, 0.508273, 1.0}, {0.19225, 0.19225, 0.19225, 1.0}, 0.4);
     malla.addMaterial({0.75164, 0.60648, 0.22648, 1.0}, {0.628281, 0.555802, 0.366065, 1.0}, {0.24725, 0.1995, 0.0745, 1.0}, 0.4);
-    nMateriales = 3;
+    nMateriales = 3;*/
     // .......completar: ...
     // .....
 
-    num_objetos = 9; // se usa al pulsar la tecla 'O' (rotar objeto actual)
+   num_objetos = 4; // se usa al pulsar la tecla 'O' (rotar objeto actual)
+   
+    
 }
 
 //**************************************************************************
@@ -81,18 +88,18 @@ void Escena::dibujar_objeto_actual()
 {
     using namespace std;
 
-    if(modo_draw && modo_dibujo==3)
-        modo_dibujo = modo_dibujo-2;
+    if (modo_draw && modo_dibujo == 3)
+        modo_dibujo = modo_dibujo - 2;
 
-    if(activar_luz)
+    /*if (activar_luz)
         luces->activar();
     else
         luces->desactivar();
 
-    if(activar_textura)
+    if (activar_textura)
         glEnable(GL_TEXTURE_2D);
     else
-        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_TEXTURE_2D);*/
 
     switch (modo_dibujo)
     {
@@ -103,14 +110,14 @@ void Escena::dibujar_objeto_actual()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Pinta en modo relleno
         glEnableClientState(GL_COLOR_ARRAY);
 
-        if(!modo_shade)
+        if (!modo_shade)
             glShadeModel(GL_SMOOTH);
         else
             glShadeModel(GL_FLAT);
 
         break;
     case 2:
-        
+
         glDisableClientState(GL_COLOR_ARRAY);
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); //Pinta en modo puntos
         glPointSize(5);
@@ -126,7 +133,8 @@ void Escena::dibujar_objeto_actual()
     switch (objeto_actual)
     {
     case 0:
-        if (cubo != nullptr){
+        if (cubo != nullptr)
+        {
             glDisable(GL_TEXTURE_2D);
             cubo->draw(modo_dibujo, modo_draw);
         }
@@ -140,12 +148,14 @@ void Escena::dibujar_objeto_actual()
             ply->draw(modo_dibujo, modo_draw);
         break;
     case 3:
-        if (cilindro != nullptr){
+        if (cilindro != nullptr)
+        {
             cilindro->draw(modo_dibujo, modo_draw);
         }
         break;
     case 4:
-        if (esfera != nullptr){
+        if (esfera != nullptr)
+        {
             esfera->draw(modo_dibujo, modo_draw);
         }
         break;
@@ -162,9 +172,10 @@ void Escena::dibujar_objeto_actual()
             obj->draw(modo_dibujo, modo_draw);
         break;
     case 8:
-        if (cuadro != nullptr){
+        if (cuadro != nullptr)
+        {
             cuadro->draw(modo_dibujo, modo_draw);
-            cuadro->textura();
+            //cuadro->textura();
         }
         break;
 
@@ -188,8 +199,122 @@ void Escena::dibujar()
     glEnable(GL_NORMALIZE);
     change_observer();
     ejes.draw();
-    dibujar_objeto_actual();
+    //dibujar_objeto_actual();
+    dibujaSeleccion();
+}
+
+void Escena::dibujaSeleccionFalso()
+{
+    glDisable(GL_DITHER);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE);
+
+    glPushMatrix();
+    glPushMatrix();
+    glTranslatef(1, 1.4, -1);
+    glColor3ub(0, 255, 255);
+    peon->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1, 0, +1);
+    glColor3ub(0, 0, 255);
+    cilindro->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1, 0, -1);
+    glColor3ub(0, 255, 0);
+    tetraedro->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(1, 0.5, 1);
+    glColor3ub(255, 0, 0);
+    cubo->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+    glPopMatrix();
+}
+
+void Escena::dibujaSeleccion()
+{
+    glDisable(GL_DITHER);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE);
+
+    glPushMatrix();
+    glPushMatrix();
+    glTranslatef(1, 1.4, -1);
+    color_obj.push_back({0, 255, 255});
+    if (vector_cambio[0] == 1)
+        glColor3ub(255, 255, 0);
+    else
+        glColor3ub(0, 255, 255);
+    peon->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1, 0, +1);
+    color_obj.push_back({0, 0, 255});
+    if (vector_cambio[1] == 1)
+        glColor3ub(255, 255, 0);
+    else
+        glColor3ub(0, 0, 255);
+    cilindro->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1, 0, -1);
+    color_obj.push_back({0, 255, 0});
+    if (vector_cambio[2] == 1)
+        glColor3ub(255, 255, 0);
+    else
+        glColor3ub(0, 255, 0);
+    tetraedro->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(1, 0.5, 1);
+    color_obj.push_back({255, 0, 0});
+    if (vector_cambio[3] == 1)
+        glColor3ub(255, 255, 0);
+    else
+        glColor3ub(255, 0, 0);
+    cubo->draw(modo_dibujo, modo_draw);
+    glPopMatrix();
+    glPopMatrix();
+}
+
+void Escena::pick_color(int x, int y)
+{
+    GLint viewport[4];
+    unsigned char pixel[3];
+    int indice;
     
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    dibujaSeleccionFalso();
+
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glReadBuffer(GL_BACK);
+    glReadPixels(x, viewport[3] - y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE,
+                 (GLubyte *)&pixel[0]);
+    printf(" valor x %d, valor y %d, color %d, %d, %d \n", x, y, pixel[0],
+           pixel[1], pixel[2]);
+
+    for(int i=0; i<num_objetos; i++)
+        if((int)pixel[0] == color_obj[i](0) && (int)pixel[1] == color_obj[i](1) && (int) pixel[2] == color_obj[i](2))
+            indice = i;
+
+    if((indice >= 0) && (indice < num_objetos))
+    {
+        if(vector_cambio[indice] == 1)
+            vector_cambio[indice] = 0;
+        else   
+            vector_cambio[indice] = 1;
+    }
+
+    this->dibujaSeleccion();
+    glutPostRedisplay();
 }
 
 //**************************************************************************
@@ -235,34 +360,34 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
     case 'a':
     case 'A':
         //Activa o desactiva las animaciones
-        if(obj != nullptr && objeto_actual == 7)
+        if (obj != nullptr && objeto_actual == 7)
         {
-            animacion? animacion=false : animacion=true;
+            animacion ? animacion = false : animacion = true;
             this->conmutarAnimaciones();
         }
         break;
-    
+
     case 'i':
     case 'I':
-        luz? luz=false : luz=true;
+        luz ? luz = false : luz = true;
         this->conmutarAnimacionesLuz();
         break;
 
     case 'x':
     case 'X':
-            num_material = (num_material + 1) % nMateriales;
-            malla.activarMaterial(num_material);
+        num_material = (num_material + 1) % nMateriales;
+        //malla.activarMaterial(num_material);
         break;
 
     case 'l':
     case 'L':
-            activar_luz = !activar_luz;
+        activar_luz = !activar_luz;
         break;
 
     case 't':
     case 'T':
-            if(objeto_actual==8)
-                activar_textura = !activar_textura;
+        if (objeto_actual == 8)
+            activar_textura = !activar_textura;
         break;
 
     case 's':
@@ -292,13 +417,15 @@ bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
 
     case 'v':
     case 'V':
-         if(!modo_draw){
+        if (!modo_draw)
+        {
             cout << "Se cambia el modo de dibujo a diferido " << endl;
             modo_draw = true;
-         }
-        else{
+        }
+        else
+        {
             cout << "Se cambia el modo de dibujo a inmediato " << endl;
-            modo_draw=false;
+            modo_draw = false;
         }
         break;
     }
@@ -329,6 +456,14 @@ void Escena::teclaEspecial(int Tecla1, int x, int y)
     case GLUT_KEY_PAGE_DOWN:
         Observer_distance /= 1.2;
         break;
+    case GLUT_KEY_F1:
+        tipo_camara = 0;
+        this->change_projection(float(Width) / float(Height));
+        break;
+    case GLUT_KEY_F2:
+        tipo_camara = 1;
+        this->change_projection(float(Width) / float(Height));
+        break;
     }
 
     //std::cout << Observer_distance << std::endl;
@@ -343,11 +478,7 @@ void Escena::teclaEspecial(int Tecla1, int x, int y)
 
 void Escena::change_projection(const float ratio_xy)
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    const float wy = 0.84 * Front_plane,
-                wx = ratio_xy * wy;
-    glFrustum(-wx, +wx, -wy, +wy, Front_plane, Back_plane);
+    camaras[tipo_camara].configProyeccion(ratio_xy);
 }
 //**************************************************************************
 // Funcion que se invoca cuando cambia el tamaño de la ventana
@@ -370,9 +501,7 @@ void Escena::change_observer()
     // posicion del observador
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -Observer_distance);
-    glRotatef(Observer_angle_x, 1.0, 0.0, 0.0);
-    glRotatef(Observer_angle_y, 0.0, 1.0, 0.0);
+    camaras[tipo_camara].configObservador();
 }
 
 void Escena::mgeDesocupado()
@@ -380,8 +509,8 @@ void Escena::mgeDesocupado()
     if (objeto_actual == 7 && animacion)
         obj->actualizarEstado();
 
-    if (glIsEnabled(GL_LIGHTING) == GL_TRUE)
-        luces->incrementarAngulo();
+    /*if (glIsEnabled(GL_LIGHTING) == GL_TRUE)
+        luces->incrementarAngulo();*/
 
     glutPostRedisplay();
 }
@@ -407,3 +536,50 @@ void Escena::conmutarAnimacionesLuz()
         glutIdleFunc(nullptr);
 }
 
+void Escena::clickRaton(int boton, int estado, int x, int y)
+{
+    if (boton == GLUT_RIGHT_BUTTON)
+    {
+        if (estado == GLUT_DOWN)
+        {
+            se_mueve_camara = true;
+            xmouse = x;
+            ymouse = y;
+        }
+        else
+        {
+            se_mueve_camara = false;
+            xmouse = 0;
+            ymouse = 0;
+        }
+    }
+    else if ((boton == GLUT_LEFT_BUTTON) && (estado == GLUT_DOWN))
+    {
+        se_mueve_camara = false;
+        se_hace_zoom = true;
+        zoom_mouse = y;
+    }
+    else if ((boton == GLUT_LEFT_BUTTON) && (estado == GLUT_UP))
+        pick_color(x, y);
+}
+
+void Escena::ratonMovido(int x, int y)
+{
+    float dx, dy;
+
+    if (se_mueve_camara)
+    {
+        dx = xmouse - x;
+        dy = ymouse - y;
+
+        camaras[tipo_camara].mover(dx, dy);
+    }
+    else if (se_hace_zoom)
+    {
+        dy = zoom_mouse - y;
+
+        camaras[tipo_camara].zoom(dy);
+    }
+
+    glutPostRedisplay();
+}
