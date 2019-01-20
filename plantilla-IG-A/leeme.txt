@@ -1,0 +1,19 @@
+Al realizar las prácticas en MAC empleando la versión del compilador gcc 4.2 compila y se ejecuta perfectamente.
+Cuando se va a compilar en linux sale error en compilación, para que lo tenga en cuenta a la hora de corregir la práctica.
+
+Comentado todo lo relativo a luces, materiales y texturas ya que no es relevante para la práctica 5 y ahorraba tiempo de compilacion.
+
+Al pulsar la tecla F2 se cambia a la camara ortogonal.
+Al pulsar la tecla F1 se cambia a la camara perspectiva.
+
+Al pulsar el botón izquierdo del ratón y arrastrar hacia arriba o hacia abajo se realiza el zoom.
+Al pulsar y soltar el botón izquierdo del ratón sobre una figura se cambia el color (de color base a amarillo o viceversa).
+Al pulsar el botón derecho del ratón y moverlo en cualquier dirección se mueve la camara en la dirección deseada.
+
+En la función pick_color(), lo que se hace es llamar a la función dibujarSeleccionadoFalso(), lo que hace es engañar
+al click del ratón ya que siempre va a detectar los colores base y asi identificar el objeto que se está seleccinando.
+Posteriormente cuando ya se selecciona el color se vuelve a llamar a la función de dibujaSeleccion() y si vector_cambio está
+en true se pinta amarillo y si está en falso se pinta en su color base. 
+
+Para añadir un nuevo objeto simplemente hay que ampliar el num_objetos, crearlo en las funciones dibujarSeleccionadoFalso y 
+dibujarSeleccionado y añadirle un color unico diferente al de los demas objetos que lo identifique.
